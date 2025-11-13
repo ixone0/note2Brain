@@ -53,7 +53,7 @@ export default function Document() {
     setIsModalOpen(false);
 
     try {
-      const response = await fetch(`http://localhost:8000/generate-quiz?user_id=${userId}`, {
+      const response = await fetch(`https://note2brain-backend.onrender.com/generate-quiz?user_id=${userId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

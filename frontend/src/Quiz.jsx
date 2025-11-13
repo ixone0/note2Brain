@@ -6,7 +6,6 @@ import "./Quiz.css";
 export default function Quiz() {
   const { quizId } = useParams();
   const navigate = useNavigate();
-  const location = useLocation();
   const [quizData, setQuizData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [currentQuestion, setCurrentQuestion] = useState(0);
