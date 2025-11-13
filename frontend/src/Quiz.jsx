@@ -82,7 +82,7 @@ export default function Quiz() {
     setLoading(true);
 
     try {
-      const response = await fetch(`http://localhost:8000/submit-quiz?user_id=${userId}`, {
+      const response = await fetch(`https://note2brain-backend.onrender.com/submit-quiz?user_id=${userId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
