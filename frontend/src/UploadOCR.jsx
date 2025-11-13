@@ -37,7 +37,7 @@ export default function UploadOCR() {
         throw new Error("User not logged in");
       }
 
-      const response = await fetch(`https://note2brain-backend.onrender.coms/upload?user_id=${userId}`, {
+      const response = await fetch(`https://note2brain-backend.onrender.com/upload?user_id=${userId}`, {
         method: 'POST',
         body: formData,
       });
