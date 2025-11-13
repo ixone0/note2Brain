@@ -22,7 +22,7 @@ export default function Quiz() {
       }
 
       try {
-        const response = await fetch(`http://localhost:8000/quiz/${quizId}?user_id=${userId}`);
+        const response = await fetch(`https://note2brain-backend.onrender.com/quiz/${quizId}?user_id=${userId}`);
         if (!response.ok) throw new Error('Failed to fetch quiz');
         
         const result = await response.json();

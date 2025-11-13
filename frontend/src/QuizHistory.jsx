@@ -25,7 +25,7 @@ export default function QuizHistory() {
 
     const fetchQuizHistory = async () => {
       try {
-        const res = await fetch(`http://localhost:8000/quiz-history?user_id=${userId}`);
+        const res = await fetch(`https://note2brain-backend.onrender.com/quiz-history?user_id=${userId}`);
         if (!res.ok) throw new Error("Failed to fetch quiz history");
         const data = await res.json();
         setQuizHistory(data.data || []);

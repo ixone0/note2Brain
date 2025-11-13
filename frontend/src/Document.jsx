@@ -18,7 +18,7 @@ export default function Document() {
   useEffect(() => {
     const fetchDoc = async () => {
       try {
-        const res = await fetch(`http://localhost:8000/document/${documentId}`);
+        const res = await fetch(`https://note2brain-backend.onrender.com/document/${documentId}`);
 
         if (!res.ok) {
           const errorData = await res.json().catch(() => ({ detail: "Document not found." }));

@@ -40,7 +40,7 @@ export default function QuizShowAns() {
     // Fallback: fetch result from backend endpoint. Do not modify backend; just call read-only route.
     const fetchResult = async () => {
       try {
-        const res = await fetch(`http://localhost:8000/quiz/${quizId}/result?user_id=${userId}`);
+        const res = await fetch(`https://note2brain-backend.onrender.com/quiz/${quizId}/result?user_id=${userId}`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const payload = await res.json();
         // Try to normalize the backend response to the expected format

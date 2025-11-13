@@ -13,7 +13,7 @@ export default function FullContext() {
   useEffect(() => {
     const fetchDoc = async () => {
       try {
-        const res = await fetch(`http://localhost:8000/document/${id}`);
+        const res = await fetch(`https://note2brain-backend.onrender.com/document/${id}`);
         if (!res.ok) {
           throw new Error('Document not found');
         }

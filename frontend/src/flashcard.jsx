@@ -33,7 +33,7 @@ export default function Flashcard() {
     setError('');
     
     try {
-      const response = await fetch('http://localhost:8000/flashcards/generate', {
+      const response = await fetch('https://note2brain-backend.onrender.com/flashcards/generate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

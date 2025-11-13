@@ -17,7 +17,7 @@ export default function Home() {
         return;
       }
       try {
-        const res = await fetch(`http://localhost:8000/documents?user_id=${userId}`);
+        const res = await fetch(`https://note2brain-backend.onrender.com/documents?user_id=${userId}`);
         const data = await res.json();
         setDocuments(data);
       } catch (err) {
