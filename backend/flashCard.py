@@ -189,3 +189,13 @@ async def generate_flashcards_endpoint(
             raise HTTPException(status_code=408, detail="Request timeout. Please try again.")
         else:
             raise HTTPException(status_code=500, detail=f"Failed to generate flashcards: {error_message}")
+        
+        
+@router.get("/flashcard")
+async def get_flashcards(questions: int, prisma = Depends(get_prisma)):
+    # ใช้ summary ล่าสุดจาก document
+    document = await prisma.document.find_first(order={"created_at": "desc"})
+    if not document:
+        raise HTTPException(status_code=404, detail="No document found")
+
+    return generate_flashcards(document.summary, questions)
