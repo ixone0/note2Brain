@@ -24,55 +24,49 @@ export default function Flashcard() {
   const isInitializingRef = useRef(false);
 
   const generateFlashcards = async () => {
-    if (!id || hasGeneratedRef.current) {
-      return;
-    }
+  if (!id || hasGeneratedRef.current) return;
 
-    isInitializingRef.current = true;
-    setLoading(true);
-    setError('');
-    
-    try {
-      const userId = localStorage.getItem('userId');
-      if (!userId) throw new Error('Missing user ID');
-      const response = await fetch('https://note2brain-backend.onrender.com/flashcards/generate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          document_id: id,
-          user_id: userId,
-          num_questions: numQuestions
-        })
-      });
+  isInitializingRef.current = true;
+  setLoading(true);
+  setError('');
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+  try {
+    const userId = localStorage.getItem('userId');
+    if (!userId) throw new Error('Missing user ID');
 
-      const data = await response.json();
-      setFlashcards(data.flashcards);
-      console.log('Generated flashcards:', data.flashcards);
-      setCurrentCard(0);
-      setIsFlipped(false);
-      
-      
-      hasGeneratedRef.current = true;
-      
-      setTimeout(() => {
-        isInitializingRef.current = false;
-      }, 200);
-      
-    } catch (error) {
-      console.error('Error generating flashcards:', error);
-      setError('Unable to generate flashcards - Please check if backend server is running');
-      hasGeneratedRef.current = false;
-      isInitializingRef.current = false;
-    } finally {
-      setLoading(false);
-    }
-  };
+    // 1. POST request เพื่อ generate
+    const postResponse = await fetch('https://note2brain-backend.onrender.com/flashcards/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        document_id: id,
+        user_id: userId,
+        num_questions: numQuestions
+      })
+    });
+
+    if (!postResponse.ok) throw new Error(`HTTP error! status: ${postResponse.status}`);
+
+    // 2. พอ POST สำเร็จ ให้ GET ข้อมูลล่าสุดจาก backend
+    const getResponse = await fetch(`https://note2brain-backend.onrender.com/flashcard?questions=${numQuestions}`);
+    if (!getResponse.ok) throw new Error(`GET error! status: ${getResponse.status}`);
+    const getData = await getResponse.json();
+
+    setFlashcards(getData); // ใช้ข้อมูลจาก GET
+    setCurrentCard(0);
+    setIsFlipped(false);
+    hasGeneratedRef.current = true;
+
+  } catch (error) {
+    console.error('Error generating flashcards:', error);
+    setError('Unable to generate flashcards - Please check if backend server is running');
+    hasGeneratedRef.current = false;
+  } finally {
+    isInitializingRef.current = false;
+    setLoading(false);
+  }
+};
+
 
   useEffect(() => {
     if (id) {
