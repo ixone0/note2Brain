@@ -193,11 +193,15 @@ async def generate_flashcards_endpoint(
 import asyncio
 @router.get("/flashcard")
 async def get_flashcards(questions: int, prisma = Depends(get_prisma)):
-    document = await prisma.document.find_first(
-        order_by=[{"createdAt": "desc"}]
+    documents = await prisma.document.find_many(
+        take=1,              # เอาแค่ 1 document ล่าสุด
+        order={"createdAt": "desc"}  # Prisma Python ใช้ `order` ไม่ใช่ `order_by`
     )
-    if not document:
+
+    if not documents:
         raise HTTPException(status_code=404, detail="No document found")
+
+    document = documents[0]
 
     # รันฟังก์ชัน sync generate_flashcards ใน thread
     flashcards = await asyncio.to_thread(generate_flashcards, document.summary, questions)
