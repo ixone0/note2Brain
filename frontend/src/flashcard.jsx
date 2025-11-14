@@ -33,6 +33,8 @@ export default function Flashcard() {
     setError('');
     
     try {
+      const userId = localStorage.getItem('userId');
+      if (!userId) throw new Error('Missing user ID');
       const response = await fetch('https://note2brain-backend.onrender.com/flashcards/generate', {
         method: 'POST',
         headers: {
@@ -40,6 +42,7 @@ export default function Flashcard() {
         },
         body: JSON.stringify({
           document_id: id,
+          user_id: userId,
           num_questions: numQuestions
         })
       });
