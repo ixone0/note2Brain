@@ -53,8 +53,10 @@ export default function Flashcard() {
 
       const data = await response.json();
       setFlashcards(data.flashcards);
+      console.log('Generated flashcards:', data.flashcards);
       setCurrentCard(0);
       setIsFlipped(false);
+      
       
       hasGeneratedRef.current = true;
       
