@@ -163,7 +163,14 @@ export default function Register() {
               type="button"
               className="link-btn"
               onClick={() => navigate('/login')}
-              style={{ background: "none", border: "none", color: "#2563eb", textDecoration: "underline", cursor: "pointer", padding: 0 }}
+              style={{background: "none",
+                border: "none",
+                color: "#3b82f6",
+                textDecoration: "underline",
+                fontWeight: 600,
+                cursor: "pointer",
+                padding: 0,
+                fontSize: "inherit" }}
             >
               Login
             </button>

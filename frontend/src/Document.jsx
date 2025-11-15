@@ -148,64 +148,67 @@ export default function Document() {
   }
 
   return (
-    <div className="home-root page-transition">
-      <header className="home-header" style={{ position: "relative" }}>
-        <img src="/logo.png" alt="logo" className="home-logo" />
-        <button className="back-btn" onClick={() => navigate("/home")}>
-          Home
-        </button>
-      </header>
-      <hr className="home-divider" />
-      <main className="home-main">
-        {/* แจ้งเตือน */}
-        {notification.message && (
-          <div
-            className={`upload-error-notification`}
-            style={{
-              marginBottom: "1.5rem",
-              background: notification.type === "error" ? "#fef2f2" : "#ecfdf5",
-              color: notification.type === "error" ? "#dc2626" : "#059669",
-              border: notification.type === "error" ? "1px solid #fecaca" : "1px solid #6ee7b7",
-              borderRadius: "8px",
-              padding: "12px 18px",
-              fontWeight: 500,
-              textAlign: "center",
-              fontSize: "15px",
-              animation: "fadeIn 0.4s"
-            }}
-          >
-            {notification.message}
-          </div>
-        )}
+    <>
+      <div className="home-root page-transition">
+        <header className="home-header" style={{ position: "relative" }}>
+          <img src="/logo.png" alt="logo" className="home-logo" />
+          <button className="back-btn" onClick={() => navigate("/home")}>
+            Home
+          </button>
+        </header>
+        <hr className="home-divider" />
+        <main className="home-main">
+          {/* แจ้งเตือน */}
+          {notification.message && (
+            <div
+              className={`upload-error-notification`}
+              style={{
+                marginBottom: "1.5rem",
+                background: notification.type === "error" ? "#fef2f2" : "#ecfdf5",
+                color: notification.type === "error" ? "#dc2626" : "#059669",
+                border: notification.type === "error" ? "1px solid #fecaca" : "1px solid #6ee7b7",
+                borderRadius: "8px",
+                padding: "12px 18px",
+                fontWeight: 500,
+                textAlign: "center",
+                fontSize: "15px",
+                animation: "fadeIn 0.4s"
+              }}
+            >
+              {notification.message}
+            </div>
+          )}
 
-        <div className="home-section-title">{doc.filename}</div>
-        <div className="summary-section">
-          <h2 className="summary-title">Summary:</h2>
-          <div className="summary-content">
-            <p className="summary-text">{doc.summary || "No summary available."}</p>
+          <div className="home-section-title">{doc.filename}</div>
+          <div className="summary-section">
+            <h2 className="summary-title">Summary:</h2>
+            <div className="summary-content">
+              <p className="summary-text">{doc.summary || "No summary available."}</p>
+            </div>
           </div>
-        </div>
-        <div className="button-container">
-          <button
-            className="simple-button"
-            onClick={() => navigate(`/document/${documentId}/context`)}
-          >
-            <FileText size={16} /> Full Context
-          </button>
-          <button
-            className="simple-button"
-            onClick={() => setIsFlashcardModalOpen(true)}
-          >
-            <Layers size={16} /> Flash Card
-          </button>
-          <button
-            className="simple-button"
-            onClick={() => setIsModalOpen(true)}
-          >
-            <Lightbulb size={16} /> Quiz
-          </button>
-        </div>
-      </main>
+          <div className="button-container">
+            <button
+              className="simple-button"
+              onClick={() => navigate(`/document/${documentId}/context`)}
+            >
+              <FileText size={16} /> Full Context
+            </button>
+            <button
+              className="simple-button"
+              onClick={() => setIsFlashcardModalOpen(true)}
+            >
+              <Layers size={16} /> Flash Card
+            </button>
+            <button
+              className="simple-button"
+              onClick={() => setIsModalOpen(true)}
+            >
+              <Lightbulb size={16} /> Quiz
+            </button>
+          </div>
+        </main>
+        
+      </div>
       <QuizGenerate
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -218,6 +221,6 @@ export default function Document() {
         onCreateFlashcard={handleCreateFlashcard}
         documentName={doc.filename}
       />
-    </div>
+    </>
   );
 }
