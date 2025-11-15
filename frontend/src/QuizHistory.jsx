@@ -44,7 +44,7 @@ export default function QuizHistory() {
 
     try {
       const userId = localStorage.getItem("userId");
-      const res = await fetch(`http://localhost:8000/quiz-attempt/${itemId}?user_id=${userId}`, {
+      const res = await fetch(`https://note2brain-backend.onrender.com/quiz-attempt/${itemId}?user_id=${userId}`, {
         method: "DELETE",
       });
 
@@ -64,7 +64,7 @@ export default function QuizHistory() {
 
     try {
       const userId = localStorage.getItem("userId");
-      const res = await fetch(`http://localhost:8000/quiz-attempts?user_id=${userId}`, {
+      const res = await fetch(`https://note2brain-backend.onrender.com/quiz-attempts?user_id=${userId}`, {
         method: "DELETE",
       });
 
