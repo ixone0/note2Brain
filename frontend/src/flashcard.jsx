@@ -142,43 +142,56 @@ export default function Flashcard() {
   }, [flashcards.length, flipCard, nextCard, prevCard, isTransitioning, loading]);
 
   const handleRegenerate = async () => {
-    if (!id) {
-      setError('Document ID not found');
+    const userId = localStorage.getItem("userId");
+    if (!userId || !id) {
+      setError("Missing user or document information.");
       return;
     }
 
     setLoading(true);
-    setError('');
-    
-    try {
-      const response = await fetch('https://note2brain-backend.onrender.com/flashcards/generate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          document_id: id,
-          num_questions: numQuestions,
-          force_new: true
-        })
-      });
+    setError("");
+    hasGeneratedRef.current = false;
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+    try {
+      const postResponse = await fetch(
+        "https://note2brain-backend.onrender.com/flashcards/generate",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            document_id: id,
+            user_id: Number(userId),
+            num_questions: numQuestions,
+            force_new: true,
+          }),
+        }
+      );
+
+      if (!postResponse.ok) {
+        const errorData = await postResponse.json().catch(() => ({
+          detail: "Failed to regenerate flashcards.",
+        }));
+        throw new Error(errorData.detail);
       }
 
-      const data = await response.json();
-      setFlashcards(data.flashcards);
-      setCurrentCard(0);
-      setIsFlipped(false);
-      
+      const data = await postResponse.json();
+
+      if (data && Array.isArray(data.flashcards)) {
+        setFlashcards(data.flashcards);
+        setCurrentCard(0);
+        setIsFlipped(false);
+        hasGeneratedRef.current = true;
+      } else {
+        throw new Error("Invalid response from server");
+      }
     } catch (error) {
-      console.error('Error regenerating flashcards:', error);
-      setError('Unable to regenerate flashcards');
+      console.error("Error regenerating flashcards:", error);
+      setError("Unable to regenerate flashcards — please try again.");
     } finally {
       setLoading(false);
     }
   };
+
 
   if (loading || isInitializingRef.current) {
     return (

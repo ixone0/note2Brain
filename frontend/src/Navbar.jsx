@@ -96,7 +96,7 @@ export default function Navbar() {
             className="navbar-logout-btn" 
             onClick={() => setShowConfirm(true)}
           >
-            Sign out
+            Sign Out
         </button>
 
         </div>
