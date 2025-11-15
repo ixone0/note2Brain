@@ -55,44 +55,41 @@
   border-radius: 20px;
   padding: 32px;
   box-shadow: 0 10px 30px rgba(30, 64, 175, 0.4);
-  animation: slideIn 0.4s ease-out;
   border: 1px solid var(--primary-blue-light);
+  color: var(--text-on-dark);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between; /* ให้ spacing เท่ากัน */
   gap: 32px;
-  color: var(--text-on-dark);
-  width: 100%;
-  max-width: 900px;
-  min-height: 700px;
+
+  width: 900px;      /* ล็อกความกว้าง */
+  max-width: 95%;    /* สำหรับ responsive เล็ก ๆ */
+  box-sizing: border-box;
 }
+
 
 .quiz-question-box {
   background: #ffffff;
   border-radius: 12px;
   padding: 24px 32px;
-  width: 100%;
-  max-width: 550px;
-  border: 1px solid var(--border-light);
+  width: 550px;
+  height: 250px;
   display: flex;
   flex-direction: column;
-  position: relative;
-  min-height: 250px;
+  justify-content: space-between;
 }
 
 .quiz-question {
   font-size: 22px;
   font-weight: 600;
   color: var(--text-dark);
-  line-height: 1.6;
-  text-align: center;
-  flex-grow: 1;
+  height: 130px;       /* ความสูงของพื้นที่แสดงคำถาม */
   overflow-y: auto;
-  padding-right: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
+  text-align: center;
 }
 .quiz-navigation {
   display: flex;
@@ -171,24 +168,31 @@
 
 .quiz-options {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 40px;
-  width: 100%;
-  max-width: 800px;
+  grid-template-columns: repeat(2, 1fr); /* fix 2 column */
+  column-gap: 40px; /* กำหนด gap แน่นอน */
+  row-gap: 40px;    /* spacing แน่นอน */
+  width: 800px;     /* fix ความกว้างรวม */
+  justify-items: stretch; /* column คงที่ ไม่ขยับ */
 }
+
 .quiz-option-label {
   background: #ffffff;
   border-radius: 12px;
-  padding: 40px 24px 24px 24px;
+  padding: 24px;       /* top/bottom ปรับตามเนื้อหา */
   cursor: pointer;
   transition: all 0.25s ease-in-out;
   border: 2px solid var(--border-light);
   color: var(--text-dark);
   position: relative;
   text-align: center;
-  display: block;
+  display: flex;        /* ใช้ flex ให้ content จัดเรียงแนวตั้ง */
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; /* ให้สูงตาม content */
   overflow: hidden;
+  width: 100%;          /* width คงที่เท่ากับ column */
 }
+
 .quiz-option-label:hover {
   border-color: var(--primary-blue);
   transform: translateY(-3px);

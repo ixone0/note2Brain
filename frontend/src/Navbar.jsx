@@ -9,6 +9,8 @@ export default function Navbar() {
   // ✨ [เพิ่ม] State สำหรับติดตามการแสดงผลและตำแหน่ง Scroll
   const [isNavbarVisible, setIsNavbarVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [showConfirm, setShowConfirm] = useState(false);
+
 
   const handleLogout = () => {
     localStorage.removeItem("userId");
@@ -41,6 +43,31 @@ export default function Navbar() {
   return (
     // ✨ [แก้ไข] เพิ่มเงื่อนไขในการใส่ Class 'navbar-hidden'
     <header className={`navbar-header ${isNavbarVisible ? '' : 'navbar-hidden'}`}>
+      {showConfirm && (
+        <div className="logout-modal-overlay">
+          <div className="logout-modal">
+            <h3>Are you sure?</h3>
+            <p>You will be signed out of your account.</p>
+
+            <div className="logout-modal-buttons">
+              <button
+                className="logout-cancel"
+                onClick={() => setShowConfirm(false)}
+              >
+                Cancel
+              </button>
+
+              <button
+                className="logout-confirm"
+                onClick={handleLogout}
+              >
+                Sign Out
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <nav className="navbar-container">
         {/* === ส่วนซ้าย: โลโก้ === */}
         <Link to="/home" className="navbar-brand">
@@ -65,9 +92,13 @@ export default function Navbar() {
 
         {/* === ส่วนขวา: ปุ่ม Logout === */}
         <div className="navbar-right-actions">
-          <button className="navbar-logout-btn" onClick={handleLogout}>
-            Logout
-          </button>
+          <button 
+            className="navbar-logout-btn" 
+            onClick={() => setShowConfirm(true)}
+          >
+            sign out
+        </button>
+
         </div>
       </nav>
     </header>

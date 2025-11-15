@@ -12,7 +12,6 @@ export default function Register() {
     uppercase: false,
   });
   const [passwordMatch, setPasswordMatch] = useState(false);
-  const [showError, setShowError] = useState(false);
   const [notification, setNotification] = useState({ message: "", type: "" });
 
   const navigate = useNavigate();
@@ -146,8 +145,6 @@ export default function Register() {
               type="submit" 
               className="continue-btn"
               disabled={!allValid || !passwordMatch}
-              onMouseEnter={() => setShowError(true)}
-              onMouseLeave={() => setShowError(false)}
             >
               <span>c</span>
               <span>o</span>
@@ -161,7 +158,15 @@ export default function Register() {
           </form>
 
           <div className="login-link">
-            Already have an account? <a href="#" onClick={(e) => {e.preventDefault(); navigate('/login')}}>Login</a>
+            Already have an account?{" "}
+            <button
+              type="button"
+              className="link-btn"
+              onClick={() => navigate('/login')}
+              style={{ background: "none", border: "none", color: "#2563eb", textDecoration: "underline", cursor: "pointer", padding: 0 }}
+            >
+              Login
+            </button>
           </div>
         </div>
 

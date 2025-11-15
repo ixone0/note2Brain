@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect  } from 'react';
 import './UploadOCR.css';
 import { useNavigate } from "react-router-dom";
 import "./Document.css";
@@ -11,12 +11,16 @@ export default function UploadOCR() {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
 
+
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
+    setError(null);
+    setResult(null);
     if (selectedFile?.type === 'application/pdf') {
-        setFile(selectedFile);
+      setFile(selectedFile);
     } else {
-        setFile(null);
+      setFile(null);
+      setError("Please select a PDF file.");
     }
   };
 
@@ -42,11 +46,14 @@ export default function UploadOCR() {
         body: formData,
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error('OCR process failed');
+        // สมมุติ backend ส่ง error message เช่น { error: "PDF must not exceed 50 pages." }
+        setError(data.error || data.detail || 'OCR process failed');
+        return;
       }
 
-      const data = await response.json();
       setResult(data);
     } catch (err) {
       setError(err.message || 'Something went wrong');
@@ -55,7 +62,6 @@ export default function UploadOCR() {
     }
   };
 
-  // Add new function to split text into lines
   const renderAnimatedText = (text) => {
     return text.split('\n').map((line, index) => (
       <div
@@ -70,6 +76,14 @@ export default function UploadOCR() {
     ));
   };
 
+  useEffect(() => {
+    // ปิด animation ชั่วคราว 50ms
+    document.body.classList.add("no-animation");
+    setTimeout(() => {
+      document.body.classList.remove("no-animation");
+    }, 50);
+  }, []);
+
   return (
     <div className="upload-container page-transition">
       <div className="upload-card">
@@ -80,12 +94,20 @@ export default function UploadOCR() {
           PDF EXTRACTOR
         </h1>
 
+        {/* แจ้งเตือน error */}
+        {error && (
+          <div className="upload-error-notification">
+            {error}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="upload-form">
           <label 
             htmlFor="file-input"
-            className={`file-upload-area ${file ? 'has-file' : ''}`}
-            data-file-name={file ? file.name : ''}
+            className={`file-upload-area ${file ? 'has-file' : ''} ${loading ? 'animate-border' : ''}`}
+            data-file-name={file ? file.name : ''}  
           >
+
             <input
               id="file-input"
               type="file"
@@ -100,12 +122,13 @@ export default function UploadOCR() {
           </label>
 
           <button
-            type="submit"
-            disabled={!file || loading}
-            className={`submit-button ${!file ? 'disabled' : ''}`}
-          >
-            {loading ? 'Processing...' : 'Extract Text'}
+              type="submit"
+              disabled={!file || loading}
+              className={`submit-button ${!file ? 'disabled' : ''} ${loading ? 'processing' : ''}`}
+            >
+              {loading ? 'Processing...' : 'Extract Text'}
           </button>
+
         </form>
 
         {result && (

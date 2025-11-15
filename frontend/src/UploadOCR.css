@@ -51,6 +51,7 @@
 }
 
 .file-upload-area {
+  transition: none;
   border: 2px dashed #cbd5e1;
   border-radius: 12px;
   padding: 2rem;
@@ -96,6 +97,7 @@
 .file-upload-area.has-file {
   border-color: transparent;
   padding: 0; /* เอา padding ออกเพื่อให้ animation ชิดขอบ */
+  transition: all 0.3s ease;
 }
 
 /* ::before คือกรอบด้านในที่แสดงชื่อไฟล์ */
@@ -133,6 +135,9 @@
     #60a5fa 95%,
     transparent 100%
   );
+}
+
+.file-upload-area.animate-border::after {
   animation: border-scanner 4s linear infinite;
 }
 
@@ -170,13 +175,11 @@
   box-shadow: 0 7px 20px rgba(59, 130, 246, 0.35);
 }
 
-.submit-button:not(:disabled)::before {
+
+.submit-button.processing::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   background-image: linear-gradient(
     100deg,
     transparent 30%,
@@ -184,9 +187,10 @@
     transparent 70%
   );
   background-size: 200% 100%;
-  background-repeat: no-repeat;
   animation: shimmer 2.5s linear infinite;
 }
+
+
 
 @keyframes shimmer {
   from {
@@ -236,3 +240,22 @@
   }
 }
 
+.upload-error-notification {
+  margin-bottom: 1.2rem;
+  padding: 12px 18px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  text-align: center;
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+  animation: fadeIn 0.4s;
+}
+
+
+/* ปิด animation และ transition ชั่วคราว */
+.no-animation * {
+  animation: none !important;
+  transition: none !important;
+}

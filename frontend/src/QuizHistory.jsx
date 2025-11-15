@@ -15,6 +15,14 @@ import './QuizHistory.css';
 export default function QuizHistory() {
   const navigate = useNavigate();
   const [quizHistory, setQuizHistory] = useState([]);
+  const [confirmModal, setConfirmModal] = useState({
+    open: false,
+    type: null, // 'delete' | 'clear'
+    targetId: null,
+    targetName: null,
+    loading: false,
+    error: null
+  });
 
   useEffect(() => {
     const userId = localStorage.getItem("userId");    
@@ -38,30 +46,45 @@ export default function QuizHistory() {
     fetchQuizHistory();
   }, [navigate]);
 
-  const handleDeleteItem = async (itemId) => {
-    const confirmDelete = window.confirm("Are you sure you want to delete this quiz?");
-    if (!confirmDelete) return;
+  // Open modal for single-delete or clear-all
+  const openConfirmModal = ({ type, targetId = null, targetName = null }) => {
+    setConfirmModal({
+      open: true,
+      type,
+      targetId,
+      targetName,
+      loading: false,
+      error: null
+    });
+  };
 
+  const closeConfirmModal = () => {
+    setConfirmModal(prev => ({ ...prev, open: false, loading: false, error: null }));
+  };
+
+  // Perform delete single item (called by modal confirm)
+  const performDelete = async () => {
+    if (!confirmModal.targetId) return;
+    setConfirmModal(prev => ({ ...prev, loading: true, error: null }));
     try {
       const userId = localStorage.getItem("userId");
-      const res = await fetch(`https://note2brain-backend.onrender.com/quiz-attempt/${itemId}?user_id=${userId}`, {
+      const res = await fetch(`https://note2brain-backend.onrender.com/quiz-attempt/${confirmModal.targetId}?user_id=${userId}`, {
         method: "DELETE",
       });
 
       if (!res.ok) throw new Error("Failed to delete quiz attempt");
 
-      const updatedHistory = quizHistory.filter(item => item.id !== itemId);
-      setQuizHistory(updatedHistory);
+      setQuizHistory(prev => prev.filter(item => item.id !== confirmModal.targetId));
+      closeConfirmModal();
     } catch (error) {
       console.error("Error deleting quiz attempt:", error);
-      alert("Failed to delete quiz attempt. Please try again.");
+      setConfirmModal(prev => ({ ...prev, loading: false, error: "Failed to delete. Please try again." }));
     }
   };
 
-  const handleClearHistory = async () => {
-    const confirmClear = window.confirm("Are you sure you want to clear all quiz history?");
-    if (!confirmClear) return;
-
+  // Perform clear all (called by modal confirm)
+  const performClearHistory = async () => {
+    setConfirmModal(prev => ({ ...prev, loading: true, error: null }));
     try {
       const userId = localStorage.getItem("userId");
       const res = await fetch(`https://note2brain-backend.onrender.com/quiz-attempts?user_id=${userId}`, {
@@ -71,17 +94,27 @@ export default function QuizHistory() {
       if (!res.ok) throw new Error("Failed to clear quiz history");
 
       setQuizHistory([]);
+      closeConfirmModal();
     } catch (error) {
       console.error("Error clearing quiz history:", error);
-      alert("Failed to clear quiz history. Please try again.");
+      setConfirmModal(prev => ({ ...prev, loading: false, error: "Failed to clear. Please try again." }));
     }
   };
 
-  const handleRetryQuiz = (quizId, documentId) => {  // เพิ่ม documentId parameter
+  // Old handlers now only open modal
+  const handleDeleteItem = (itemId, itemName) => {
+    openConfirmModal({ type: 'delete', targetId: itemId, targetName: itemName });
+  };
+
+  const handleClearHistory = () => {
+    openConfirmModal({ type: 'clear' });
+  };
+
+  const handleRetryQuiz = (quizId, documentId) => {
     navigate(`/quiz/${quizId}`, {
       state: { 
         isRetry: true,
-        documentId: documentId  // เพิ่ม documentId ใน state
+        documentId: documentId
       }
     });
   };
@@ -196,11 +229,14 @@ export default function QuizHistory() {
                 </button>
                 <button 
                   className="retry-btn history-action-btn"
-                  onClick={() => handleRetryQuiz(item.quizId, item.quiz.document.id)}  // ส่ง documentId ด้วย
+                  onClick={() => handleRetryQuiz(item.quizId, item.quiz.document.id)}
                 >
                   <RotateCw size={16} /> Retry
                 </button>
-                <button className="history-action-btn delete-btn" onClick={() => handleDeleteItem(item.id)}>
+                <button 
+                  className="history-action-btn delete-btn" 
+                  onClick={() => handleDeleteItem(item.id, item.quiz.document.filename)}
+                >
                   <Trash2 size={16} /> Delete
                 </button>
               </footer>
@@ -208,7 +244,47 @@ export default function QuizHistory() {
           );
         })}
       </main>
+
+      {/* ===== Confirmation Modal (reuses style from your logout example) ===== */}
+      {confirmModal.open && (
+        <div className="confirm-modal-overlay" role="dialog" aria-modal="true">
+          <div className="confirm-modal">
+            <h3>
+              {confirmModal.type === 'delete' ? 'Confirm Delete' : 'Clear All History'}
+            </h3>
+            <p>
+              {confirmModal.type === 'delete' ? (
+                <>Are you sure you want to delete this quiz attempt for <strong>"{confirmModal.targetName}"</strong>?</>
+              ) : (
+                <>Are you sure you want to clear <strong>all</strong> quiz history? This cannot be undone.</>
+              )}
+            </p>
+
+            {confirmModal.error && (
+              <p style={{ color: '#f87171', marginBottom: 12 }}>{confirmModal.error}</p>
+            )}
+
+            <div className="logout-modal-buttons" style={{ marginTop: 8 }}>
+              <button
+                className="logout-cancel"
+                onClick={closeConfirmModal}
+                disabled={confirmModal.loading}
+                aria-disabled={confirmModal.loading}
+              >
+                Cancel
+              </button>
+              <button
+                className="logout-confirm"
+                onClick={confirmModal.type === 'delete' ? performDelete : performClearHistory}
+                disabled={confirmModal.loading}
+                aria-disabled={confirmModal.loading}
+              >
+                {confirmModal.loading ? 'Working...' : (confirmModal.type === 'delete' ? 'Delete' : 'Clear All')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-

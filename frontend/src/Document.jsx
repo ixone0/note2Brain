@@ -14,6 +14,7 @@ export default function Document() {
   const [isGeneratingQuiz, setIsGeneratingQuiz] = useState(false);
   const [isFlashcardModalOpen, setIsFlashcardModalOpen] = useState(false);
   const [isGeneratingFlashcard, setIsGeneratingFlashcard] = useState(false);
+  const [notification, setNotification] = useState({ message: "", type: "" });
 
   useEffect(() => {
     const fetchDoc = async () => {
@@ -45,7 +46,7 @@ export default function Document() {
   const handleCreateQuiz = async ({ difficulty, numQuestions }) => {
     const userId = localStorage.getItem("userId");
     if (!userId || !documentId) {
-      alert("Error: Missing user or document information.");
+      setNotification({ message: "Error: Missing user or document information.", type: "error" });
       return;
     }
 
@@ -70,14 +71,12 @@ export default function Document() {
 
       const result = await response.json();
       if (result.success && result.quiz_id) {
-        console.log("UserID BEFORE navigate:", localStorage.getItem("userId"));
         navigate(`/quiz/${result.quiz_id}`);
       } else {
         throw new Error(result.detail || 'Quiz ID not received from backend');
       }
     } catch (error) {
-      console.error("Error generating quiz:", error);
-      alert(`Error generating quiz: ${error.message}\nPlease try again.`);
+      setNotification({ message: `Error generating quiz: ${error.message}`, type: "error" });
     } finally {
       setIsGeneratingQuiz(false);
     }
@@ -90,8 +89,7 @@ export default function Document() {
     try {
       navigate(`/document/${documentId}/flashcard?questions=${numQuestions}`);
     } catch (error) {
-      console.error("Error setting up flashcard:", error);
-      alert(`Error: ${error.message}`);
+      setNotification({ message: `Error: ${error.message}`, type: "error" });
     } finally {
       setIsGeneratingFlashcard(false);
     }
@@ -159,6 +157,27 @@ export default function Document() {
       </header>
       <hr className="home-divider" />
       <main className="home-main">
+        {/* แจ้งเตือน */}
+        {notification.message && (
+          <div
+            className={`upload-error-notification`}
+            style={{
+              marginBottom: "1.5rem",
+              background: notification.type === "error" ? "#fef2f2" : "#ecfdf5",
+              color: notification.type === "error" ? "#dc2626" : "#059669",
+              border: notification.type === "error" ? "1px solid #fecaca" : "1px solid #6ee7b7",
+              borderRadius: "8px",
+              padding: "12px 18px",
+              fontWeight: 500,
+              textAlign: "center",
+              fontSize: "15px",
+              animation: "fadeIn 0.4s"
+            }}
+          >
+            {notification.message}
+          </div>
+        )}
+
         <div className="home-section-title">{doc.filename}</div>
         <div className="summary-section">
           <h2 className="summary-title">Summary:</h2>
