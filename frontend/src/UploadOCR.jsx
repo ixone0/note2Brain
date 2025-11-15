@@ -118,6 +118,16 @@ export default function UploadOCR() {
                 </div>
               </div>
             </div>
+            {/* ✨ ปุ่มไปยัง Document */}
+            {result.document_id && (
+              <button
+                className="submit-button"
+                style={{ marginTop: "1.5rem" }}
+                onClick={() => navigate(`/document/${result.document_id}`)}
+              >
+                Go to Document
+              </button>
+            )}
           </div>
         )}
       </div>

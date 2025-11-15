@@ -135,7 +135,8 @@ async def upload_file(
     return {
         "filename": file.filename,
         "ocr_text": ocr_text,
-        "summary": summary
+        "summary": summary,
+        "document_id": document.id  # ✨ ส่ง document_id กลับมาด้วย
     }
 
 

@@ -13,6 +13,7 @@ export default function Register() {
   });
   const [passwordMatch, setPasswordMatch] = useState(false);
   const [showError, setShowError] = useState(false);
+  const [notification, setNotification] = useState({ message: "", type: "" });
 
   const navigate = useNavigate();
 
@@ -27,7 +28,7 @@ export default function Register() {
   useEffect(() => {
     if (confirmPassword) {
       setPasswordMatch(password === confirmPassword);
-    }else {
+    } else {
       setPasswordMatch(false);
     }
   }, [password, confirmPassword]);
@@ -50,15 +51,17 @@ export default function Register() {
       });
 
       const data = await res.json();
-      
+
       if (res.ok) {
-        alert("Registration successful!");
-        navigate("/login");
+        setNotification({ message: "Registration successful! Redirecting to login...", type: "success" });
+        setTimeout(() => {
+          navigate("/login");
+        }, 1500);
       } else {
-        alert(data.detail || "Registration failed");
+        setNotification({ message: data.detail || "Registration failed", type: "error" });
       }
     } catch (err) {
-      alert("Network error");
+      setNotification({ message: "Network error", type: "error" });
       console.error(err);
     }
   };
@@ -70,7 +73,14 @@ export default function Register() {
       <div className="register-container">
         <div className="register-content">
           <h1>Getting Started</h1>
-          <p className="subtitle">Seems you are new here.Let's set up your profile.</p>
+          <p className="subtitle">Seems you are new here. Let's set up your profile.</p>
+
+          {/* Notification */}
+          {notification.message && (
+            <div className={`register-notification ${notification.type}`}>
+              {notification.message}
+            </div>
+          )}
 
           <form onSubmit={handleSubmit}>
             <div className="form-group">
@@ -104,33 +114,33 @@ export default function Register() {
             </div>
 
             <div className={`password-status ${
-  !confirmPassword ? 'neutral' : 
-  passwordMatch ? 'match' : 'not-match'
-}`}>
-  {!confirmPassword ? 'Password do not match' :
-   passwordMatch ? 'Password match' : 'Password do not match'}
-</div>
+              !confirmPassword ? 'neutral' : 
+              passwordMatch ? 'match' : 'not-match'
+            }`}>
+              {!confirmPassword ? 'Password do not match' :
+                passwordMatch ? 'Password match' : 'Password do not match'}
+            </div>
 
             <div className={`password-rules ${allValid ? 'all-valid' : ''}`}>
-  <div className={`rule ${passwordValidation.length ? 'valid' : 'invalid'}`}>
-    <span className="rule-icon">
-      {passwordValidation.length ? '✓' : '✕'}
-    </span>
-    Password must be at least 8 characters long.
-  </div>
-  <div className={`rule ${passwordValidation.number ? 'valid' : 'invalid'}`}>
-    <span className="rule-icon">
-      {passwordValidation.number ? '✓' : '✕'}
-    </span>
-    Password must contain at least one digit (0-9).
-  </div>
-  <div className={`rule ${passwordValidation.uppercase ? 'valid' : 'invalid'}`}>
-    <span className="rule-icon">
-      {passwordValidation.uppercase ? '✓' : '✕'}
-    </span>
-    Password must contain at least one uppercase letter.
-  </div>
-</div>
+              <div className={`rule ${passwordValidation.length ? 'valid' : 'invalid'}`}>
+                <span className="rule-icon">
+                  {passwordValidation.length ? '✓' : '✕'}
+                </span>
+                Password must be at least 8 characters long.
+              </div>
+              <div className={`rule ${passwordValidation.number ? 'valid' : 'invalid'}`}>
+                <span className="rule-icon">
+                  {passwordValidation.number ? '✓' : '✕'}
+                </span>
+                Password must contain at least one digit (0-9).
+              </div>
+              <div className={`rule ${passwordValidation.uppercase ? 'valid' : 'invalid'}`}>
+                <span className="rule-icon">
+                  {passwordValidation.uppercase ? '✓' : '✕'}
+                </span>
+                Password must contain at least one uppercase letter.
+              </div>
+            </div>
 
             <button 
               type="submit" 
