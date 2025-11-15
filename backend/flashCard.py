@@ -6,6 +6,7 @@ import json
 import os
 import random
 import time
+import asyncio
 
 router = APIRouter()
 
@@ -156,29 +157,51 @@ Random: {random_seed + current_time}
 @router.post("/flashcards/generate")
 async def generate_flashcards_endpoint(
     document_id: str = Body(...),
+    user_id: int = Body(...),                # เพิ่มรับ user_id จาก client
     num_questions: int = Body(10),
-    force_new: bool = Body(False),  # เพิ่ม parameter นี้
+    force_new: bool = Body(False),
     prisma = Depends(get_prisma)
 ):
     try:
+        # ยืนยันว่า document นั้นเป็นของ user นี้
         document = await prisma.document.find_first(
-            where={"id": document_id}
+            where={"id": document_id, "ownerId": user_id}
         )
         if not document:
-            raise HTTPException(status_code=404, detail="Document not found")
-        
+            raise HTTPException(status_code=404, detail="Document not found or not owned by user")
         if not document.summary:
             raise HTTPException(status_code=400, detail="Document summary not available. Please upload document again.")
-            
-        # สร้าง flashcards ตามจำนวนที่เลือก
-        flashcards = generate_flashcards(document.summary, num_questions)
-        
+
+        # เรียก generate (blocking -> to_thread ถ้าต้อง)
+        flashcards_data = await asyncio.to_thread(generate_flashcards, document.summary, num_questions)
+
+        # ถ้าขอ force_new ให้ลบของเดิมก่อน
+        if force_new:
+            await prisma.flashcard.delete_many(where={"documentId": document_id, "ownerId": user_id})
+
+        # สร้างและบันทึกแต่ละ flashcard ลง DB
+        created = []
+        for fc in flashcards_data:
+            created_fc = await prisma.flashcard.create(
+                data={
+                    "question": fc.get("question") or fc.get("prompt") or fc["q"],
+                    "answer": fc.get("answer") or fc.get("a") or fc["ans"],
+                    "ownerId": user_id,
+                    "documentId": document_id
+                }
+            )
+            created.append({
+                "id": created_fc.id,
+                "question": created_fc.question,
+                "answer": created_fc.answer
+            })
+
         return {
-            "flashcards": flashcards, 
-            "count": len(flashcards),
+            "flashcards": created,
+            "count": len(created),
             "generated_at": int(time.time())
         }
-        
+
     except HTTPException:
         raise
     except Exception as e:
@@ -189,21 +212,35 @@ async def generate_flashcards_endpoint(
             raise HTTPException(status_code=408, detail="Request timeout. Please try again.")
         else:
             raise HTTPException(status_code=500, detail=f"Failed to generate flashcards: {error_message}")
-        
-import asyncio
+
+
+# GET /flashcard (ปรับให้รองรับ document_id)
 @router.get("/flashcard")
-async def get_flashcards(questions: int, user_id: int, prisma=Depends(get_prisma)):
-    documents = await prisma.document.find_many(
-        where={"ownerId": user_id},  # 🔑 กรองเฉพาะ document ของ user
-        take=1,
-        order={"createdAt": "desc"}
+async def get_flashcards(questions: int, user_id: int, document_id: str | None = None, prisma=Depends(get_prisma)):
+    # ถ้ามี document_id ให้ดึง document นั้น (และตรวจว่าเป็นของ user นี้)
+    if document_id:
+        document = await prisma.document.find_first(where={"id": document_id, "ownerId": user_id})
+        if not document:
+            raise HTTPException(status_code=404, detail="Document not found or not owned by user")
+    else:
+        documents = await prisma.document.find_many(
+            where={"ownerId": user_id},
+            take=1,
+            order={"createdAt": "desc"}
+        )
+        if not documents:
+            raise HTTPException(status_code=404, detail="No document found")
+        document = documents[0]
+
+    # ดึง flashcards ของ document นี้ (limit ด้วย questions)
+    flashcards = await prisma.flashcard.find_many(
+        where={"documentId": document.id},
+        take=questions,
+        order={"id": "asc"}
     )
 
-    if not documents:
-        raise HTTPException(status_code=404, detail="No document found")
-
-    document = documents[0]
-    flashcards = await asyncio.to_thread(generate_flashcards, document.summary, questions)
-    return flashcards
-
-
+    # ส่งกลับเป็น array ของ {id, question, answer}
+    return [
+        {"id": fc.id, "question": fc.question, "answer": fc.answer}
+        for fc in flashcards
+    ]

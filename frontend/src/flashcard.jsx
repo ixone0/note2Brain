@@ -24,51 +24,51 @@ export default function Flashcard() {
   const isInitializingRef = useRef(false);
 
   const generateFlashcards = async () => {
-  if (!id || hasGeneratedRef.current) return;
+    if (!id || hasGeneratedRef.current) return;
 
-  isInitializingRef.current = true;
-  setLoading(true);
-  setError('');
+    isInitializingRef.current = true;
+    setLoading(true);
+    setError('');
 
-  try {
-    const userId = localStorage.getItem('userId');
-    if (!userId) throw new Error('Missing user ID');
+    try {
+      const userId = localStorage.getItem('userId');
+      if (!userId) throw new Error('Missing user ID');
 
-    // 1. POST request เพื่อ generate
-    const postResponse = await fetch('https://note2brain-backend.onrender.com/flashcards/generate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        document_id: id,
-        user_id: userId,
-        num_questions: numQuestions
-      })
-    });
+      // POST เพื่อ generate (backend จะ return flashcards ที่บันทึกแล้ว)
+      const postResponse = await fetch('https://note2brain-backend.onrender.com/flashcards/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          document_id: id,
+          user_id: Number(userId),
+          num_questions: numQuestions
+        })
+      });
 
-    if (!postResponse.ok) throw new Error(`HTTP error! status: ${postResponse.status}`);
+      if (!postResponse.ok) throw new Error(`HTTP error! status: ${postResponse.status}`);
 
-    // 2. พอ POST สำเร็จ ให้ GET ข้อมูลล่าสุดจาก backend
-    const getResponse = await fetch(
-      `https://note2brain-backend.onrender.com/flashcard?questions=${numQuestions}&user_id=${userId}`
-    );
+      const postData = await postResponse.json();
 
-    if (!getResponse.ok) throw new Error(`GET error! status: ${getResponse.status}`);
-    const getData = await getResponse.json();
+      // ใช้ผลจาก POST ตรงๆ (ไม่ต้อง GET)
+      if (postData && Array.isArray(postData.flashcards)) {
+        setFlashcards(postData.flashcards);
+        setCurrentCard(0);
+        setIsFlipped(false);
+        hasGeneratedRef.current = true;
+      } else {
+        throw new Error('Invalid response from server');
+      }
 
-    setFlashcards(getData); // ใช้ข้อมูลจาก GET
-    setCurrentCard(0);
-    setIsFlipped(false);
-    hasGeneratedRef.current = true;
+    } catch (error) {
+      console.error('Error generating flashcards:', error);
+      setError('Unable to generate flashcards - Please check if backend server is running');
+      hasGeneratedRef.current = false;
+    } finally {
+      isInitializingRef.current = false;
+      setLoading(false);
+    }
+  };
 
-  } catch (error) {
-    console.error('Error generating flashcards:', error);
-    setError('Unable to generate flashcards - Please check if backend server is running');
-    hasGeneratedRef.current = false;
-  } finally {
-    isInitializingRef.current = false;
-    setLoading(false);
-  }
-};
 
 
   useEffect(() => {
