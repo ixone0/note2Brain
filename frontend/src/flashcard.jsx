@@ -48,7 +48,10 @@ export default function Flashcard() {
     if (!postResponse.ok) throw new Error(`HTTP error! status: ${postResponse.status}`);
 
     // 2. พอ POST สำเร็จ ให้ GET ข้อมูลล่าสุดจาก backend
-    const getResponse = await fetch(`https://note2brain-backend.onrender.com/flashcard?questions=${numQuestions}`);
+    const getResponse = await fetch(
+      `https://note2brain-backend.onrender.com/flashcard?questions=${numQuestions}&user_id=${userId}`
+    );
+
     if (!getResponse.ok) throw new Error(`GET error! status: ${getResponse.status}`);
     const getData = await getResponse.json();
 
