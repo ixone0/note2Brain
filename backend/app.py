@@ -40,9 +40,16 @@ def typhoon_ocr(file: UploadFile):
     reader = PdfReader(pdf_stream)
     num_pages = len(reader.pages)
     pages = list(range(1, num_pages + 1))
+    
+    if num_pages > 50:
+        raise HTTPException(
+            status_code=400,
+            detail=f"PDF must not exceed 50 pages. Your file has {num_pages} pages."
+        )
 
     pdf_stream.seek(0)
     files = {"file": (file.filename, pdf_stream, file.content_type)}
+    
 
     params = {
         "model": "typhoon-ocr-preview",
