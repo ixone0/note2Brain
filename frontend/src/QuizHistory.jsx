@@ -154,10 +154,7 @@ export default function QuizHistory() {
       <div className="history-container">
         <div className="empty-state">
           <History size={64} className="empty-icon" />
-          <h2 className="empty-title">No Quiz History</h2>
-          <p className="empty-description">
-            It looks like you haven't taken any quizzes yet. Start learning and test your knowledge!
-          </p>
+          <h2 className="empty-title">No Quiz History Yet</h2>
           <button className="empty-btn" onClick={() => navigate('/home')}>
             Explore Documents
           </button>
