@@ -146,14 +146,14 @@ export default function Register() {
               className="continue-btn"
               disabled={!allValid || !passwordMatch}
             >
-              <span>c</span>
-              <span>o</span>
-              <span>n</span>
-              <span>t</span>
+              <span>S</span>
               <span>i</span>
+              <span>g</span>
               <span>n</span>
-              <span>u</span>
-              <span>e</span>
+              <span> </span>
+              <span>U</span>
+              <span>p</span>
+
             </button>
           </form>
 
@@ -172,7 +172,7 @@ export default function Register() {
                 padding: 0,
                 fontSize: "inherit" }}
             >
-              Login
+              Sign In
             </button>
           </div>
         </div>
