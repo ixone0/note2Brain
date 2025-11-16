@@ -49,7 +49,7 @@ export default function Document() {
       setNotification({ message: "Error: Missing user or document information.", type: "error" });
       return;
     }
-
+    
     setIsGeneratingQuiz(true);
     setIsModalOpen(false);
 
@@ -83,17 +83,27 @@ export default function Document() {
   };
 
   const handleCreateFlashcard = async ({ numQuestions }) => {
-    setIsGeneratingFlashcard(true);
-    setIsFlashcardModalOpen(false);
 
-    try {
-      navigate(`/document/${documentId}/flashcard?questions=${numQuestions}`);
-    } catch (error) {
-      setNotification({ message: `Error: ${error.message}`, type: "error" });
-    } finally {
-      setIsGeneratingFlashcard(false);
-    }
-  };
+  if (parseInt(numQuestions, 10) > 20) {
+    setNotification({
+      message: "Error generating flashcard: Maximum number of questions is 20.",
+      type: "error"
+    });
+    return;
+  }
+
+  setIsGeneratingFlashcard(true);
+  setIsFlashcardModalOpen(false);
+
+  try {
+    navigate(`/document/${documentId}/flashcard?questions=${numQuestions}`);
+  } catch (error) {
+    setNotification({ message: `Error: ${error.message}`, type: "error" });
+  } finally {
+    setIsGeneratingFlashcard(false);
+  }
+};
+
 
   if (loading) {
     return (

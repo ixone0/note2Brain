@@ -44,7 +44,7 @@ export default function FlashcardGenerate({ isOpen, onClose, onCreateFlashcard, 
             onClick={handleCreateClick}
             disabled={!numQuestions || Number(numQuestions) < 1}
           >
-            Generate Flashcards
+            Generate Flashcard
           </button>
         </div>
       </div>

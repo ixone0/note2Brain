@@ -231,7 +231,7 @@ async def generate_quiz(
     
     # Validate question_count
     if request.question_count < 1 or request.question_count > 20:
-        raise HTTPException(status_code=400, detail="question_count ต้องอยู่ระหว่าง 1-20")
+        raise HTTPException(status_code=400, detail="Maximum number of questions is 20.")
 
     # 1️⃣ ตรวจสอบ document ของ user
     document = await prisma.document.find_first(

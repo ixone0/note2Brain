@@ -84,7 +84,7 @@ export default function QuizGenerate({ isOpen, onClose, onCreateQuiz, documentNa
             onClick={handleCreateClick}
             disabled={!numQuestions || Number(numQuestions) < 1}
           >
-            Create Quiz
+            Generate Quiz
           </button>
         </div>
       </div>
